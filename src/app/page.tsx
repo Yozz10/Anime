@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import ShimmerCard from "../components/ShimmerCard";
 
 export default function Home() {
   const [animeList, setAnimeList] = useState<any[]>([]);
@@ -11,13 +12,11 @@ export default function Home() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [animating, setAnimating] = useState<number | null>(null);
 
-  // 🔹 Ambil daftar favorit dari localStorage saat pertama kali load
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("favorites") || "[]");
     setFavorites(saved);
   }, []);
 
-  // 🔹 Fetch data anime
   const fetchAnime = async (query?: string) => {
     setLoading(true);
     try {
@@ -37,13 +36,11 @@ export default function Home() {
     fetchAnime();
   }, []);
 
-  // 🔹 Fungsi pencarian
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchAnime(search);
   };
 
-  // 🔹 Menambahkan / menghapus anime favorit
   const toggleFavorite = (id: number) => {
     let updated = [...favorites];
     if (updated.includes(id)) {
@@ -59,7 +56,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-pink-50 px-4 py-6 max-w-6xl mx-auto transition-all duration-300">
-      {/* === Navbar === */}
       <nav className="flex justify-end mb-4">
         <Link
           href="/favorites"
@@ -69,7 +65,6 @@ export default function Home() {
         </Link>
       </nav>
 
-      {/* === Header === */}
       <header className="text-center mb-8">
         <h1 className="text-4xl font-bold text-pink-600 animate-bounce-slow">
           🌸 Pencari Rekomendasi Anime 🌸
@@ -96,13 +91,14 @@ export default function Home() {
         </form>
       </header>
 
-      {/* === Konten === */}
       {loading ? (
-        <p className="text-center text-gray-500 mt-8 animate-pulse">
-          Memuat data...
-        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <ShimmerCard key={i} />
+          ))}
+        </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 animate-fade-in">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {animeList.map((anime) => (
             <div
               key={anime.mal_id}
@@ -113,8 +109,6 @@ export default function Home() {
                 alt={anime.title}
                 className="w-full h-48 object-cover"
               />
-
-              {/* Tombol Favorit 💖 */}
               <button
                 onClick={() => toggleFavorite(anime.mal_id)}
                 className={`absolute top-2 right-2 text-2xl transition-transform duration-300 ${
@@ -129,14 +123,11 @@ export default function Home() {
               >
                 💖
               </button>
-
-              {/* Info Anime */}
               <div className="p-3">
                 <h3 className="text-sm font-semibold text-pink-700 truncate">
                   {anime.title}
                 </h3>
                 <p className="text-xs text-pink-500">⭐ {anime.score || "N/A"}</p>
-
                 <Link
                   href={`/anime/${anime.mal_id}`}
                   className="block mt-3 text-center bg-pink-500 text-white rounded-lg py-1 text-xs font-medium hover:bg-pink-600 transition"
