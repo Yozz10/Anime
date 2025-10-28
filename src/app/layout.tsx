@@ -34,7 +34,7 @@ export default function RootLayout({
         {/* 🌸 Navbar */}
         <nav className="sticky top-0 z-50 bg-white/60 backdrop-blur-md shadow-sm border-b border-pink-100">
           <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
-            {/* Kiri */}
+            {/* 🌸 Kiri */}
             <Link
               href="/"
               className="text-pink-600 font-extrabold text-2xl tracking-tight hover:text-pink-700 transition"
@@ -42,7 +42,7 @@ export default function RootLayout({
               🌸 AnimeID
             </Link>
 
-            {/* Kanan */}
+            {/* 🌸 Kanan */}
             <div className="flex items-center gap-4">
               <Link
                 href="/"
@@ -50,6 +50,14 @@ export default function RootLayout({
               >
                 Home
               </Link>
+
+              <Link
+                href="/genre"
+                className="text-pink-700 font-medium hover:text-pink-900 transition"
+              >
+                Genre
+              </Link>
+
               <Link
                 href="/favorites"
                 className="bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow hover:bg-pink-600 active:scale-95 transition"
@@ -85,7 +93,8 @@ export default function RootLayout({
             >
               Jikan API
             </a>{" "}
-            — © {new Date().getFullYear()} <span className="font-semibold">AnimeID</span>
+            — © {new Date().getFullYear()}{" "}
+            <span className="font-semibold">AnimeID</span>
           </p>
         </footer>
       </body>
