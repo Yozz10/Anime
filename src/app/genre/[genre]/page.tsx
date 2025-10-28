@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import ShimmerCard from "../../../components/ShimmerCard";
 
 export default function GenrePage() {
   const { genre } = useParams();
@@ -12,42 +11,41 @@ export default function GenrePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchGenreAnime = async () => {
+    const fetchByGenre = async () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `https://api.jikan.moe/v4/anime?genres=${genre}&limit=18&order_by=popularity`
+          `https://api.jikan.moe/v4/anime?genres=${encodeURIComponent(
+            genre as string
+          )}&limit=18&order_by=popularity`
         );
-        setAnimeList(res.data.data);
-      } catch (error) {
-        console.error("Gagal mengambil data genre:", error);
+        setAnimeList(res.data.data || []);
+      } catch (err) {
+        console.error("Gagal memuat genre:", err);
       } finally {
         setLoading(false);
       }
     };
-
-    if (genre) fetchGenreAnime();
+    fetchByGenre();
   }, [genre]);
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8 min-h-screen">
-      <h1 className="text-3xl font-bold text-center text-pink-600 mb-6 animate-bounce-slow capitalize">
-        🎭 Genre: {genre}
+    <main className="min-h-screen bg-pink-50 px-4 py-8 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold text-pink-600 mb-6 text-center capitalize">
+        🌸 Genre: {genre}
       </h1>
 
       {loading ? (
+        <p className="text-center text-gray-500 animate-pulse">Memuat...</p>
+      ) : animeList.length === 0 ? (
+        <p className="text-center text-pink-500">Tidak ada anime di genre ini 😢</p>
+      ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <ShimmerCard key={i} />
-          ))}
-        </div>
-      ) : animeList.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 animate-fade-in">
           {animeList.map((anime) => (
             <Link
-              href={`/anime/${anime.mal_id}`}
               key={anime.mal_id}
-              className="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden"
+              href={`/anime/${anime.mal_id}`}
+              className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden relative"
             >
               <img
                 src={anime.images.jpg.image_url}
@@ -63,8 +61,6 @@ export default function GenrePage() {
             </Link>
           ))}
         </div>
-      ) : (
-        <p className="text-center text-gray-500">Tidak ada anime untuk genre ini 😢</p>
       )}
     </main>
   );
