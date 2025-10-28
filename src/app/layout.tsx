@@ -1,126 +1,161 @@
-import "../globals.css";
+"use client";
+
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-import LoadingBar from "../components/LoadingBar";
-import { useState } from "react";
+import Image from "next/image";
+import ShimmerCard from "./components/ShimmerCard";
 
-export const metadata = {
-  title: "AnimeID 🌸",
-  description: "Temukan dan simpan anime favoritmu dengan gaya imut!",
-  metadataBase: new URL("https://animeid.vercel.app"),
-  openGraph: {
-    title: "AnimeID 🌸",
-    description: "Website anime pink pastel dengan API Jikan",
-    images: ["/og-image.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "AnimeID 🌸",
-    description: "Temukan anime favoritmu dengan tampilan pink pastel",
-    images: ["/og-image.png"],
-  },
-};
+export default function Home() {
+  const [animeList, setAnimeList] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [animating, setAnimating] = useState<number | null>(null);
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const genres = [
-    "action",
-    "romance",
-    "comedy",
-    "fantasy",
-    "drama",
-    "horror",
-    "sci-fi",
-    "slice-of-life",
-  ];
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("favorites") || "[]");
+    setFavorites(saved);
+  }, []);
+
+  const fetchAnime = async (query?: string) => {
+    setLoading(true);
+    try {
+      const url = query
+        ? `https://api.jikan.moe/v4/anime?q=${query}&limit=18&order_by=popularity`
+        : `https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=18`;
+      const res = await axios.get(url);
+      setAnimeList(res.data.data);
+    } catch (err) {
+      console.error("Gagal memuat data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnime();
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchAnime(search);
+  };
+
+  const toggleFavorite = (id: number) => {
+    let updated = [...favorites];
+    if (updated.includes(id)) {
+      updated = updated.filter((f) => f !== id);
+    } else {
+      updated.push(id);
+      setAnimating(id);
+      setTimeout(() => setAnimating(null), 600);
+    }
+    setFavorites(updated);
+    localStorage.setItem("favorites", JSON.stringify(updated));
+  };
 
   return (
-    <html lang="id">
-      <body className="bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 text-gray-800 font-inter min-h-screen">
-        {/* 🌸 Loading Bar */}
-        <LoadingBar />
+    <main className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 px-4 py-6 max-w-6xl mx-auto transition-all duration-300">
+      {/* 🌸 Navbar */}
+      <nav className="flex justify-end mb-4">
+        <Link
+          href="/favorites"
+          className="bg-pink-500 text-white px-4 py-2 rounded-full text-sm shadow hover:bg-pink-600 active:scale-95 transition"
+        >
+          💖 Favorit
+        </Link>
+      </nav>
 
-        {/* 🌸 Navbar */}
-        <nav className="sticky top-0 z-50 bg-white/60 backdrop-blur-md shadow-sm border-b border-pink-100">
-          <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
-            {/* 🌸 Logo kiri */}
-            <Link
-              href="/"
-              className="text-pink-600 font-extrabold text-2xl tracking-tight hover:text-pink-700 transition"
-            >
-              🌸 AnimeID
-            </Link>
+      {/* 🌸 Header */}
+      <header className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-pink-600 animate-bounce-slow">
+          🌸 Pencari Rekomendasi Anime 🌸
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Temukan anime favoritmu berikutnya — ringan, cepat, dan imut 💕
+        </p>
 
-            {/* 🌸 Menu kanan */}
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="text-pink-700 font-medium hover:text-pink-900 transition"
-              >
-                Home
-              </Link>
-
-              {/* Dropdown Genre */}
-              <div className="relative group">
-                <button className="text-pink-700 font-medium hover:text-pink-900 transition flex items-center gap-1">
-                  Genre ▾
-                </button>
-                <div className="absolute hidden group-hover:block bg-white shadow-lg border border-pink-100 rounded-lg mt-2 p-2 w-40">
-                  {genres.map((g) => (
-                    <Link
-                      key={g}
-                      href={`/genre/${g}`}
-                      className="block px-3 py-1.5 text-sm text-pink-700 hover:bg-pink-100 rounded-md transition"
-                    >
-                      {g.charAt(0).toUpperCase() + g.slice(1)}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <Link
-                href="/favorites"
-                className="bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow hover:bg-pink-600 active:scale-95 transition"
-              >
-                💖 Favorit
-              </Link>
-            </div>
-          </div>
-        </nav>
-
-        {/* 🌸 Transisi antar halaman */}
-        <AnimatePresence mode="wait">
-          <motion.main
-            key={typeof window !== "undefined" ? window.location.pathname : ""}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="max-w-6xl mx-auto px-4 py-6"
+        <form
+          onSubmit={handleSearch}
+          className="flex justify-center mt-6 max-w-md mx-auto"
+        >
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari anime..."
+            className="flex-1 p-3 rounded-l-lg border border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
+          />
+          <button
+            type="submit"
+            className="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-lg font-semibold"
           >
-            {children}
-          </motion.main>
-        </AnimatePresence>
+            Cari
+          </button>
+        </form>
+      </header>
 
-        {/* 🌸 Footer */}
-        <footer className="text-center text-sm text-gray-500 py-6 border-t border-pink-200 mt-10 bg-white/50 backdrop-blur-sm">
-          <p>
-            Dibuat dengan 💕 menggunakan{" "}
-            <a
-              href="https://jikan.moe/"
-              target="_blank"
-              className="text-pink-500 hover:underline"
+      {/* 🌸 Konten Utama */}
+      {loading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <ShimmerCard key={i} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 animate-fade-in">
+          {animeList.map((anime) => (
+            <div
+              key={anime.mal_id}
+              className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden relative transform hover:-translate-y-1"
             >
-              Jikan API
-            </a>{" "}
-            — © {new Date().getFullYear()}{" "}
-            <span className="font-semibold">AnimeID</span>
-          </p>
-        </footer>
-      </body>
-    </html>
+              {/* Gambar dengan Lazy Loading */}
+              <Image
+                src={anime.images.jpg.image_url}
+                alt={anime.title}
+                width={300}
+                height={400}
+                className="w-full h-48 object-cover"
+                loading="lazy"
+              />
+
+              {/* Tombol Favorit */}
+              <button
+                onClick={() => toggleFavorite(anime.mal_id)}
+                aria-label="Tambahkan ke favorit"
+                className={`absolute top-2 right-2 text-2xl transition-transform duration-300 ${
+                  animating === anime.mal_id
+                    ? "scale-125 animate-pulse"
+                    : "scale-100"
+                } ${
+                  favorites.includes(anime.mal_id)
+                    ? "text-pink-500"
+                    : "text-gray-400 hover:text-pink-400"
+                }`}
+              >
+                💖
+              </button>
+
+              {/* Info Anime */}
+              <div className="p-3">
+                <h3 className="text-sm font-semibold text-pink-700 truncate">
+                  {anime.title}
+                </h3>
+                <p className="text-xs text-pink-500">
+                  ⭐ {anime.score || "N/A"}
+                </p>
+                <Link
+                  href={`/anime/${anime.mal_id}`}
+                  className="block mt-3 text-center bg-pink-500 text-white rounded-lg py-1 text-xs font-medium hover:bg-pink-600 transition"
+                >
+                  🎬 Tonton
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
   );
 }
