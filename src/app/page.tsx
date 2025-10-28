@@ -9,9 +9,9 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [animating, setAnimating] = useState<number | null>(null); // 🩷 animasi ID
 
   useEffect(() => {
-    // Ambil daftar favorit dari localStorage
     const saved = JSON.parse(localStorage.getItem("favorites") || "[]");
     setFavorites(saved);
   }, []);
@@ -41,6 +41,8 @@ export default function Home() {
       updated = updated.filter((f) => f !== id);
     } else {
       updated.push(id);
+      setAnimating(id); // aktifkan animasi
+      setTimeout(() => setAnimating(null), 600); // reset animasi
     }
     setFavorites(updated);
     localStorage.setItem("favorites", JSON.stringify(updated));
@@ -103,10 +105,14 @@ export default function Home() {
                 className="w-full h-48 object-cover"
               />
 
-              {/* Tombol Favorit */}
+              {/* Tombol Favorit 💖 */}
               <button
                 onClick={() => toggleFavorite(anime.mal_id)}
-                className={`absolute top-2 right-2 text-lg ${
+                className={`absolute top-2 right-2 text-2xl transition-transform duration-300 ${
+                  animating === anime.mal_id
+                    ? "scale-125 animate-pulse"
+                    : "scale-100"
+                } ${
                   favorites.includes(anime.mal_id)
                     ? "text-pink-500"
                     : "text-gray-400 hover:text-pink-400"
