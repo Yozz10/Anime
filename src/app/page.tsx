@@ -8,8 +8,14 @@ export default function Home() {
   const [animeList, setAnimeList] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const [favorites, setFavorites] = useState<number[]>([]);
 
-  // === FETCH ANIME ===
+  useEffect(() => {
+    // Ambil daftar favorit dari localStorage
+    const saved = JSON.parse(localStorage.getItem("favorites") || "[]");
+    setFavorites(saved);
+  }, []);
+
   const fetchAnime = async (query?: string) => {
     setLoading(true);
     const url = query
@@ -29,50 +35,38 @@ export default function Home() {
     fetchAnime(search);
   };
 
-  // === FAVORITE SYSTEM ===
-  const toggleFavorite = (anime: any) => {
-    let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-    const exists = favs.some((a: any) => a.mal_id === anime.mal_id);
-
-    if (exists) {
-      favs = favs.filter((a: any) => a.mal_id !== anime.mal_id);
+  const toggleFavorite = (id: number) => {
+    let updated = [...favorites];
+    if (updated.includes(id)) {
+      updated = updated.filter((f) => f !== id);
     } else {
-      favs.push(anime);
+      updated.push(id);
     }
-
-    localStorage.setItem("favorites", JSON.stringify(favs));
-    alert(
-      exists
-        ? `❌ ${anime.title} dihapus dari favorit`
-        : `💖 ${anime.title} ditambahkan ke favorit`
-    );
+    setFavorites(updated);
+    localStorage.setItem("favorites", JSON.stringify(updated));
   };
 
   return (
-    <main className="min-h-screen px-4 py-6 max-w-6xl mx-auto">
-      {/* 🌸 Navbar Sederhana */}
-      <nav className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-pink-600">
-          Anime<span className="text-pink-400">ID</span>
-        </h1>
+    <main className="min-h-screen bg-pink-50 px-4 py-6 max-w-6xl mx-auto">
+      {/* Navbar */}
+      <nav className="flex justify-end mb-4">
         <Link
           href="/favorites"
-          className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-full text-sm shadow transition"
+          className="bg-pink-500 text-white px-4 py-2 rounded-full text-sm shadow hover:bg-pink-600 transition"
         >
           💖 Favorit
         </Link>
       </nav>
 
-      {/* 🩷 Header */}
+      {/* Header */}
       <header className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-pink-600">
+        <h1 className="text-4xl font-bold text-pink-600">
           Pencari Rekomendasi Anime
-        </h2>
+        </h1>
         <p className="text-gray-600 mt-2">
           Temukan anime favoritmu berikutnya!
         </p>
 
-        {/* 🔍 Form Search */}
         <form
           onSubmit={handleSearch}
           className="flex justify-center mt-6 max-w-md mx-auto"
@@ -93,7 +87,7 @@ export default function Home() {
         </form>
       </header>
 
-      {/* 🎬 Konten */}
+      {/* Konten */}
       {loading ? (
         <p className="text-center text-gray-500">Memuat data...</p>
       ) : (
@@ -101,30 +95,38 @@ export default function Home() {
           {animeList.map((anime) => (
             <div
               key={anime.mal_id}
-              className="relative bg-pink-100 rounded-xl shadow-md hover:shadow-lg transition"
+              className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden relative"
             >
-              {/* 💖 Tombol Favorit */}
+              <img
+                src={anime.images.jpg.image_url}
+                alt={anime.title}
+                className="w-full h-48 object-cover"
+              />
+
+              {/* Tombol Favorit */}
               <button
-                onClick={() => toggleFavorite(anime)}
-                className="absolute top-2 right-2 bg-pink-500 text-white text-xs px-2 py-1 rounded-full shadow hover:bg-pink-600 transition"
+                onClick={() => toggleFavorite(anime.mal_id)}
+                className={`absolute top-2 right-2 text-lg ${
+                  favorites.includes(anime.mal_id)
+                    ? "text-pink-500"
+                    : "text-gray-400 hover:text-pink-400"
+                }`}
               >
                 💖
               </button>
 
-              {/* 🎥 Gambar + Link ke detail */}
-              <Link href={`/anime/${anime.mal_id}`} className="block">
-                <img
-                  src={anime.images.jpg.image_url}
-                  alt={anime.title}
-                  className="rounded-t-xl w-full"
-                />
-                <div className="p-2">
-                  <h3 className="text-sm font-semibold text-pink-700 truncate">
-                    {anime.title}
-                  </h3>
-                  <p className="text-xs text-pink-500">⭐ {anime.score}</p>
-                </div>
-              </Link>
+              <div className="p-2">
+                <h3 className="text-sm font-semibold text-pink-700 truncate">
+                  {anime.title}
+                </h3>
+                <p className="text-xs text-pink-500">⭐ {anime.score}</p>
+                <Link
+                  href={`/anime/${anime.mal_id}`}
+                  className="block mt-2 text-center bg-pink-500 text-white rounded-lg py-1 text-xs font-medium hover:bg-pink-600"
+                >
+                  🎬 Tonton
+                </Link>
+              </div>
             </div>
           ))}
         </div>
