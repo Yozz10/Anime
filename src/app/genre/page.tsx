@@ -1,37 +1,53 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import axios from "axios";
 
-const genreList = [
-  { id: 1, name: "Action" },
-  { id: 2, name: "Adventure" },
-  { id: 4, name: "Comedy" },
-  { id: 8, name: "Drama" },
-  { id: 10, name: "Fantasy" },
-  { id: 22, name: "Romance" },
-  { id: 24, name: "Sci-Fi" },
-  { id: 30, name: "Sports" },
-  { id: 37, name: "Supernatural" },
-];
+export default function GenrePage() {
+  const [genres, setGenres] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function GenreMenu() {
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const res = await axios.get("https://api.jikan.moe/v4/genres/anime");
+        setGenres(res.data.data);
+      } catch (err) {
+        console.error("Gagal memuat genre:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGenres();
+  }, []);
+
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8 min-h-screen text-center">
-      <h1 className="text-3xl font-bold text-pink-600 mb-6 animate-bounce-slow">
-        🎀 Pilih Genre Anime
+    <main className="min-h-screen px-4 py-8 max-w-5xl mx-auto">
+      <h1 className="text-4xl font-bold text-center text-pink-600 mb-8">
+        🌸 Daftar Genre Anime 🌸
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {genreList.map((g) => (
-          <Link
-            key={g.id}
-            href={`/genre/${g.id}`}
-            className="bg-pink-200 hover:bg-pink-300 text-pink-800 font-semibold py-3 rounded-xl shadow transition transform hover:-translate-y-1"
-          >
-            {g.name}
-          </Link>
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-center text-gray-500 animate-pulse">
+          Memuat daftar genre...
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 animate-fade-in">
+          {genres.map((genre) => (
+            <Link
+              key={genre.mal_id}
+              href={`/genre/${genre.mal_id}`}
+              className="bg-pink-100 hover:bg-pink-200 text-pink-800 font-semibold rounded-xl shadow p-4 text-center transition transform hover:-translate-y-1"
+            >
+              {genre.name}
+              <span className="block text-sm text-gray-500 mt-1">
+                {genre.count} anime
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
