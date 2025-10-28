@@ -1,21 +1,66 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { fetchJikan } from "../../../lib/api";
 
-export default async function AnimeDetail({
-  params,
-}: {
-  params: { id: string };
-}) {
-  // Ambil data dari Jikan API
-  const data = await fetchJikan(`/anime/${params.id}/full`);
-  const anime = data.data;
+export default function AnimeDetail({ params }: { params: { id: string } }) {
+  const [anime, setAnime] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
 
-  if (!anime) {
+  // Ambil data dari Jikan API
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchJikan(`/anime/${params.id}/full`);
+      setAnime(data.data);
+      setLoading(false);
+    };
+    fetchData();
+  }, [params.id]);
+
+  // Cek apakah anime ini sudah ada di favorit
+  useEffect(() => {
+    if (anime) {
+      const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
+      setIsFavorite(stored.some((item: any) => item.mal_id === anime.mal_id));
+    }
+  }, [anime]);
+
+  const toggleFavorite = () => {
+    const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
+    let updated;
+
+    if (isFavorite) {
+      // Hapus dari favorit
+      updated = stored.filter((item: any) => item.mal_id !== anime.mal_id);
+    } else {
+      // Tambahkan ke favorit
+      const newFav = {
+        mal_id: anime.mal_id,
+        title: anime.title,
+        image: anime.images.jpg.image_url,
+        score: anime.score,
+      };
+      updated = [...stored, newFav];
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(updated));
+    setIsFavorite(!isFavorite);
+  };
+
+  if (loading)
     return (
-      <main className="min-h-screen flex items-center justify-center text-pink-600 text-xl">
+      <main className="text-center mt-10 text-gray-500 animate-pulse">
+        Memuat data...
+      </main>
+    );
+
+  if (!anime)
+    return (
+      <main className="text-center mt-10 text-pink-600">
         ❌ Anime tidak ditemukan.
       </main>
     );
-  }
 
   return (
     <main className="min-h-screen px-4 py-6 max-w-3xl mx-auto text-gray-800">
@@ -24,15 +69,29 @@ export default async function AnimeDetail({
         {anime.title}
       </h1>
 
-      {/* Gambar utama */}
+      {/* Gambar */}
       <img
         src={anime.images?.jpg?.large_image_url}
         alt={anime.title}
         className="rounded-2xl shadow-lg mb-6 w-full"
       />
 
+      {/* Tombol favorit */}
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={toggleFavorite}
+          className={`px-5 py-2 rounded-full font-semibold shadow transition ${
+            isFavorite
+              ? "bg-pink-600 text-white hover:bg-pink-700"
+              : "bg-pink-100 text-pink-700 hover:bg-pink-200"
+          }`}
+        >
+          {isFavorite ? "💔 Hapus dari Favorit" : "💖 Tambah ke Favorit"}
+        </button>
+      </div>
+
       {/* Info singkat */}
-      <div className="bg-pink-100 rounded-xl p-4 shadow-inner space-y-2">
+      <div className="bg-pink-50 rounded-xl p-4 shadow-inner space-y-2">
         <p>
           <strong>Genre:</strong>{" "}
           {anime.genres?.map((g: any) => g.name).join(", ") || "-"}
