@@ -82,3 +82,19 @@ a:hover {
     border-radius: 0.75rem;
   }
 }
+
+/* === BUTTON GLOW & INTERAKSI === */
+button {
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+  border: none;
+  outline: none;
+}
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(233, 30, 99, 0.4);
+}
+button:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 4px rgba(233, 30, 99, 0.2);
+}
