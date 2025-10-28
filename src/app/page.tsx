@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Link from "next/link"; // 🩷 tambahkan import ini
 
 export default function Home() {
   const [animeList, setAnimeList] = useState<any[]>([]);
@@ -62,9 +63,10 @@ export default function Home() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {animeList.map((anime) => (
-            <div
+            <Link
               key={anime.mal_id}
-              className="card bg-pink-100 rounded-xl shadow-md hover:shadow-lg transition"
+              href={`/anime/${anime.mal_id}`} // 🩷 arahkan ke halaman detail
+              className="card bg-pink-100 rounded-xl shadow-md hover:shadow-lg transition block"
             >
               <img
                 src={anime.images.jpg.image_url}
@@ -77,7 +79,7 @@ export default function Home() {
                 </h3>
                 <p className="text-xs text-pink-500">⭐ {anime.score}</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
