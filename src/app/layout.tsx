@@ -1,6 +1,7 @@
 import "../globals.css";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion"; // ✨ animasi transisi halaman
+import { AnimatePresence, motion } from "framer-motion";
+import LoadingBar from "../components/LoadingBar";
 
 export const metadata = {
   title: "AnimeID 🌸",
@@ -26,20 +27,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="bg-pink-50 text-gray-800 font-inter min-h-screen transition-all duration-300">
+      <body className="bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 text-gray-800 font-inter min-h-screen">
+        {/* 🌸 Loading Bar */}
+        <LoadingBar />
+
         {/* 🌸 Navbar */}
-        <nav className="bg-pink-200/80 backdrop-blur-sm shadow-md sticky top-0 z-50">
+        <nav className="sticky top-0 z-50 bg-white/60 backdrop-blur-md shadow-sm border-b border-pink-100">
           <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
+            {/* Kiri */}
             <Link
               href="/"
-              className="text-pink-700 font-extrabold text-2xl tracking-tight hover:text-pink-800 transition"
+              className="text-pink-600 font-extrabold text-2xl tracking-tight hover:text-pink-700 transition"
             >
               🌸 AnimeID
             </Link>
-            <div className="flex items-center gap-3">
+
+            {/* Kanan */}
+            <div className="flex items-center gap-4">
               <Link
                 href="/"
-                className="text-pink-700 font-semibold hover:text-pink-900 transition"
+                className="text-pink-700 font-medium hover:text-pink-900 transition"
               >
                 Home
               </Link>
@@ -53,23 +60,33 @@ export default function RootLayout({
           </div>
         </nav>
 
-        {/* ✨ Transisi halaman */}
+        {/* 🌸 Transisi antar halaman */}
         <AnimatePresence mode="wait">
           <motion.main
             key={typeof window !== "undefined" ? window.location.pathname : ""}
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="p-4"
+            className="max-w-6xl mx-auto px-4 py-6"
           >
             {children}
           </motion.main>
         </AnimatePresence>
 
         {/* 🌸 Footer */}
-        <footer className="text-center text-sm text-gray-500 py-4 border-t border-pink-200 mt-10">
-          Dibuat dengan 💕 menggunakan Jikan API — © {new Date().getFullYear()} AnimeID
+        <footer className="text-center text-sm text-gray-500 py-6 border-t border-pink-200 mt-10 bg-white/50 backdrop-blur-sm">
+          <p>
+            Dibuat dengan 💕 menggunakan{" "}
+            <a
+              href="https://jikan.moe/"
+              target="_blank"
+              className="text-pink-500 hover:underline"
+            >
+              Jikan API
+            </a>{" "}
+            — © {new Date().getFullYear()} <span className="font-semibold">AnimeID</span>
+          </p>
         </footer>
       </body>
     </html>
