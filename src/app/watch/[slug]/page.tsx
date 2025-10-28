@@ -15,14 +15,14 @@ export default function WatchPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 🔍 Ambil data anime berdasarkan slug (judul)
+        // Ambil data anime berdasarkan judul
         const searchRes = await axios.get(
           `https://api.jikan.moe/v4/anime?q=${slug}&limit=1`
         );
         const animeData = searchRes.data.data[0];
         setAnime(animeData);
 
-        // 📺 Ambil daftar episode
+        // Ambil daftar episode
         const episodesRes = await axios.get(
           `https://api.jikan.moe/v4/anime/${animeData.mal_id}/episodes`
         );
@@ -52,13 +52,12 @@ export default function WatchPage() {
     );
 
   return (
-    <main className="relative max-w-5xl mx-auto px-4 py-8 pb-24">
-      {/* Judul */}
+    <main className="max-w-5xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center text-pink-600 mb-4">
         {anime.title}
       </h1>
 
-      {/* 🎥 Player */}
+      {/* Trailer / Video Player */}
       <div className="rounded-2xl overflow-hidden shadow-lg mb-6">
         {selectedEpisode ? (
           <ReactPlayer
@@ -76,7 +75,7 @@ export default function WatchPage() {
         )}
       </div>
 
-      {/* 📝 Info Singkat */}
+      {/* Info Singkat */}
       <div className="bg-pink-50 p-4 rounded-xl shadow-inner mb-6">
         <p className="text-gray-700 mb-2">
           <strong>Episode:</strong> {anime.episodes || "?"}
@@ -92,11 +91,20 @@ export default function WatchPage() {
         </p>
       </div>
 
-      {/* 📚 Daftar Episode */}
-      <h2 className="text-2xl font-semibold text-pink-600 mb-4">
+      {/* Tombol Kembali */}
+      <div className="flex justify-center mb-6">
+        <a
+          href="/"
+          className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full shadow transition"
+        >
+          ⬅️ Kembali ke Beranda
+        </a>
+      </div>
+
+      {/* Daftar Episode */}
+      <h2 className="text-2xl font-semibold text-pink-600 mb-4 text-center">
         Daftar Episode
       </h2>
-
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {episodes.length > 0 ? (
           episodes.map((ep) => (
@@ -115,22 +123,6 @@ export default function WatchPage() {
         ) : (
           <p className="text-gray-500 col-span-full text-center">
             Tidak ada data episode 😅
-          </p>
-        )}
-      </div>
-
-      {/* 🎬 Tombol sticky */}
-      <div className="fixed bottom-4 left-0 w-full flex justify-center z-50">
-        <a
-          href={`/watch/${anime.title.toLowerCase().replace(/\s+/g, "-")}`}
-          className="bg-pink-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-pink-600 transition font-semibold animate-bounce-slow"
-        >
-          🎬 Tonton Sekarang
-        </a>
-      </div>
-    </main>
-  );
-}            Tidak ada data episode 😅
           </p>
         )}
       </div>
