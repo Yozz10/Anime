@@ -1,68 +1,37 @@
-import "./globals.css";
-import Link from "next/link";
-import ThemeToggle from "../components/ThemeToggle"; // 🩷 Tambahkan ini
+"use client";
 
-export const metadata = {
-  title: "AnimeID 🌸",
-  description: "Streaming & Info Anime dengan Jikan API",
-  openGraph: {
-    title: "AnimeID 🌸",
-    description: "Temukan anime favoritmu dengan tampilan cantik & lembut",
-    images: ["/og-image.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "AnimeID 🌸",
-    description: "Website pencarian anime dengan tema pink pastel",
-    images: ["/og-image.png"],
-  },
-};
+import { useEffect, useState } from "react";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function ThemeToggle() {
+  const [darkMode, setDarkMode] = useState(false);
+
+  // 🔹 Load theme dari localStorage saat pertama kali
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      setDarkMode(true);
+    }
+  }, []);
+
+  // 🔹 Ganti tema dan simpan ke localStorage
+  const toggleTheme = () => {
+    const newTheme = darkMode ? "light" : "dark";
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", newTheme);
+    setDarkMode(!darkMode);
+  };
+
   return (
-    <html lang="id">
-      <body className="bg-pink-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col transition-colors duration-500">
-        {/* 🌸 Navbar */}
-        <nav className="bg-pink-200/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md sticky top-0 z-50 transition-all duration-500">
-          <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
-            <Link
-              href="/"
-              className="text-pink-700 dark:text-pink-300 font-extrabold text-2xl tracking-tight hover:text-pink-800 dark:hover:text-pink-400 transition animate-bounce-slow"
-            >
-              🌸 AnimeID
-            </Link>
-
-            <div className="flex items-center gap-3">
-              <Link
-                href="/"
-                className="text-pink-700 dark:text-pink-300 font-semibold hover:text-pink-900 dark:hover:text-pink-400 transition"
-              >
-                Home
-              </Link>
-
-              <Link
-                href="/favorites"
-                className="bg-pink-500 dark:bg-pink-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow hover:bg-pink-600 dark:hover:bg-pink-500 active:scale-95 transition"
-              >
-                💖 Favorit
-              </Link>
-
-              {/* 🌙 Tombol Toggle Tema */}
-              <ThemeToggle />
-            </div>
-          </div>
-        </nav>
-
-        {/* 🌸 Konten */}
-        <main className="flex-1 p-4 max-w-6xl mx-auto w-full animate-fade-in">
-          {children}
-        </main>
-
-        {/* 🌸 Footer */}
-        <footer className="text-center text-sm text-gray-500 dark:text-gray-400 py-4 border-t border-pink-200 dark:border-gray-700 mt-10">
-          Dibuat dengan 💕 menggunakan Jikan API — © {new Date().getFullYear()} AnimeID
-        </footer>
-      </body>
-    </html>
+    <button
+      onClick={toggleTheme}
+      className="bg-pink-500 dark:bg-gray-700 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow hover:scale-105 active:scale-95 transition flex items-center gap-2"
+    >
+      {darkMode ? "🌙 Mode Gelap" : "🌸 Mode Pink"}
+    </button>
   );
 }
