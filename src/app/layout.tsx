@@ -1,4 +1,4 @@
-import "../globals.css";
+import "./globals.css";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import LoadingBar from "../components/LoadingBar";
