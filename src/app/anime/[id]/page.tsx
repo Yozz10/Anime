@@ -13,7 +13,7 @@ export default async function AnimeDetail({ params }: { params: { id: string } }
 
       {/* Gambar utama */}
       <img
-        src={anime.images.jpg.large_image_url}
+        src={anime.images?.jpg?.large_image_url || "/no-image.jpg"}
         alt={anime.title}
         className="rounded-2xl shadow-lg mb-6 w-full"
       />
@@ -22,7 +22,7 @@ export default async function AnimeDetail({ params }: { params: { id: string } }
       <div className="bg-pink-100 rounded-xl p-4 shadow-inner space-y-2">
         <p>
           <strong>Genre:</strong>{" "}
-          {anime.genres.map((g: any) => g.name).join(", ")}
+          {anime.genres?.map((g: any) => g.name).join(", ") || "Tidak ada"}
         </p>
         <p>
           <strong>Episodes:</strong> {anime.episodes || "?"}
@@ -31,12 +31,14 @@ export default async function AnimeDetail({ params }: { params: { id: string } }
           <strong>Score:</strong> ⭐ {anime.score || "N/A"}
         </p>
         <p>
-          <strong>Status:</strong> {anime.status}
+          <strong>Status:</strong> {anime.status || "Unknown"}
         </p>
       </div>
 
       {/* Sinopsis */}
-      <p className="text-gray-700 leading-relaxed mt-6">{anime.synopsis}</p>
+      <p className="text-gray-700 leading-relaxed mt-6 whitespace-pre-line">
+        {anime.synopsis || "Sinopsis belum tersedia."}
+      </p>
 
       {/* Trailer */}
       {anime.trailer?.youtube_id && (
