@@ -1,4 +1,4 @@
-import "../globals.css";
+import "./globals.css";
 import Link from "next/link";
 
 export const metadata = {
@@ -13,19 +13,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="bg-pink-50 text-gray-800 min-h-screen">
+      <body className="bg-pink-50 text-gray-800 min-h-screen flex flex-col">
         {/* 🌸 Navbar */}
         <nav className="bg-pink-200/80 backdrop-blur-sm shadow-md sticky top-0 z-50">
           <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
-            {/* Kiri */}
+            {/* 🩷 Logo */}
             <Link
               href="/"
-              className="text-pink-700 font-extrabold text-2xl tracking-tight hover:text-pink-800 transition"
+              className="text-pink-700 font-extrabold text-2xl tracking-tight hover:text-pink-800 transition animate-bounce-slow"
             >
               🌸 AnimeID
             </Link>
 
-            {/* Kanan */}
+            {/* 🩷 Menu kanan */}
             <div className="flex items-center gap-3">
               <Link
                 href="/"
@@ -45,11 +45,14 @@ export default function RootLayout({
         </nav>
 
         {/* 🌸 Konten Halaman */}
-        <main className="p-4">{children}</main>
+        <main className="flex-1 p-4 max-w-6xl mx-auto w-full animate-fade-in">
+          {children}
+        </main>
 
         {/* 🌸 Footer */}
         <footer className="text-center text-sm text-gray-500 py-4 border-t border-pink-200 mt-10">
-          Dibuat dengan 💕 menggunakan Jikan API — © {new Date().getFullYear()} AnimeID
+          Dibuat dengan 💕 menggunakan Jikan API — ©{" "}
+          {new Date().getFullYear()} AnimeID
         </footer>
       </body>
     </html>
